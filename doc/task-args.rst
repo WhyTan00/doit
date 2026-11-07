@@ -40,6 +40,7 @@ For python-actions the python function must define arguments with the same name 
 
 Need a list in your python function? Specify an option with ``type``
 set to ``list``.
+Each invocation uses its own list, so appending values does not modify the default.
 
 .. code-block:: console
 

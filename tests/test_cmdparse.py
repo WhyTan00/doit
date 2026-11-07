@@ -330,6 +330,31 @@ class TestCommand(unittest.TestCase):
         params, args = self.cmd.parse(['-f','p1','p2', '--sub-arg'])
         self.assertEqual(['p1','p2', '--sub-arg'], args)
 
+    def test_list_defaults_are_not_changed_by_parsing(self):
+        self.cmd.overwrite_defaults({'list': ['default']})
+        first, _ = self.cmd.parse(['-l', 'first'])
+        self.assertEqual(['default', 'first'], first['list'])
+        self.assertEqual(['default'], self.cmd['list'].default)
+
+        second, _ = self.cmd.parse(['-l', 'second'])
+        self.assertEqual(['default', 'second'], second['list'])
+        self.assertEqual(['default', 'first'], first['list'])
+        defaults, _ = self.cmd.parse([])
+        self.assertEqual(['default'], defaults['list'])
+
+    def test_list_defaults_are_not_changed_by_result_mutation(self):
+        first, _ = self.cmd.parse([])
+        first['list'].append('added')
+        second, _ = self.cmd.parse([])
+        self.assertEqual([], second['list'])
+        self.assertEqual([], self.cmd['list'].default)
+
+    def test_list_defaults_are_not_changed_by_failed_parsing(self):
+        self.assertRaises(CmdParseError, self.cmd.parse,
+                          ['-l', 'first', '-n', 'invalid'])
+        defaults, _ = self.cmd.parse([])
+        self.assertEqual([], defaults['list'])
+
     def test_parseError(self):
         self.assertRaises(CmdParseError, self.cmd.parse, ['--not-exist-param'])
 

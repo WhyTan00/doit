@@ -353,7 +353,8 @@ class CmdParse:
         params = DefaultUpdate()
         # add default values
         for opt in self._options.values():
-            params.set_default(opt.name, opt.default)
+            default = copy.copy(opt.default) if opt.type is list else opt.default
+            params.set_default(opt.name, default)
 
         # get values from shell ENV
         for opt in self._options.values():
